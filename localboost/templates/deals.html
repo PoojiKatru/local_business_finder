@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deals & Coupons | LocalBoost</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --bg-card: #1f1f1f;
+            --bg-card-hover: #262626;
+            --accent-primary: #ff6b35;
+            --accent-secondary: #f7931e;
+            --accent-gradient: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1a1;
+            --text-tertiary: #6b6b6b;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-accent: rgba(255, 107, 53, 0.3);
+            --shadow-glow: 0 0 40px rgba(255, 107, 53, 0.15);
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-full: 9999px;
+            --transition-base: 0.3s ease;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 16px 32px;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            font-size: 24px;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover, .nav-links a.active { color: var(--text-primary); }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 120px 24px 64px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .page-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-full);
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .page-badge-icon {
+            color: var(--accent-primary);
+        }
+
+        .page-title {
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: -2px;
+            margin-bottom: 16px;
+        }
+
+        .page-title span {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 48px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .filter-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--border-accent);
+        }
+
+        .filter-btn.active {
+            color: var(--text-primary);
+            background: var(--accent-gradient);
+            border-color: transparent;
+        }
+
+        /* Deals Grid */
+        .deals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+        }
+
+        .deal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transition: all var(--transition-base);
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .deal-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--border-accent);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .deal-image {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+        }
+
+        .deal-content {
+            padding: 24px;
+        }
+
+        .deal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .deal-discount {
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            border-radius: var(--radius-full);
+        }
+
+        .deal-category {
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-full);
+            color: var(--text-secondary);
+        }
+
+        .deal-business {
+            font-size: 13px;
+            color: var(--accent-primary);
+            margin-bottom: 8px;
+        }
+
+        .deal-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .deal-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .deal-code-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border: 1px dashed var(--border-accent);
+            border-radius: var(--radius-md);
+            margin-bottom: 16px;
+        }
+
+        .deal-code {
+            font-family: monospace;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent-primary);
+        }
+
+        .copy-btn {
+            margin-left: auto;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            background: var(--accent-gradient);
+            border: none;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .copy-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .deal-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .deal-expiry {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .view-business {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .view-business:hover {
+            text-decoration: underline;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 64px 24px;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-card);
+            border-radius: 50%;
+            color: var(--text-tertiary);
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 64px;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid var(--border-subtle);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .page-title { font-size: 36px; }
+            .deals-grid { grid-template-columns: 1fr; }
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--bg-card); border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">LocalBoost</a>
+            <ul class="nav-links">
+                <li><a href="/explore">Explore</a></li>
+                <li><a href="/deals" class="active">Deals</a></li>
+                <li><a href="/favorites">Favorites</a></li>
+                <li><a href="/reports">Reports</a></li>
+                <li><a href="/help">Help</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <div class="page-badge">
+                <svg class="page-badge-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
+                    <line x1="7" y1="7" x2="7.01" y2="7"/>
+                </svg>
+                Limited Time Offers
+            </div>
+            <h1 class="page-title">Special <span>Deals</span></h1>
+            <p class="page-subtitle">Save money while supporting local businesses. Exclusive discounts and coupons updated regularly.</p>
+        </div>
+
+        <div class="filters">
+            <button class="filter-btn active" data-category="all">All Deals</button>
+            <button class="filter-btn" data-category="food">Food & Dining</button>
+            <button class="filter-btn" data-category="retail">Retail</button>
+            <button class="filter-btn" data-category="services">Services</button>
+            <button class="filter-btn" data-category="entertainment">Entertainment</button>
+            <button class="filter-btn" data-category="health">Health</button>
+        </div>
+
+        <div class="deals-grid" id="deals-grid">
+            <div class="loading">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentCategory = 'all';
+
+        async function fetchDeals() {
+            const grid = document.getElementById('deals-grid');
+            grid.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+            try {
+                let url = '/api/deals';
+                if (currentCategory !== 'all') {
+                    url += `?category=${currentCategory}`;
+                }
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.deals.length === 0) {
+                    grid.innerHTML = `
+                        <div class="empty-state" style="grid-column: 1 / -1;">
+                            <div class="empty-icon">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
+                                    <line x1="7" y1="7" x2="7.01" y2="7"/>
+                                </svg>
+                            </div>
+                            <h3 style="font-size: 20px; margin-bottom: 8px;">No deals available</h3>
+                            <p style="color: var(--text-secondary);">Check back soon for new offers!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                grid.innerHTML = data.deals.map(deal => `
+                    <div class="deal-card">
+                        <img class="deal-image" src="${deal.business_image || 'https://via.placeholder.com/400x160'}" alt="${deal.business_name}">
+                        <div class="deal-content">
+                            <div class="deal-header">
+                                <span class="deal-discount">${formatDiscount(deal)}</span>
+                                <span class="deal-category">${formatCategory(deal.business_category)}</span>
+                            </div>
+                            <div class="deal-business">${deal.business_name}</div>
+                            <h3 class="deal-title">${deal.title}</h3>
+                            <p class="deal-description">${deal.description}</p>
+                            ${deal.code ? `
+                                <div class="deal-code-container">
+                                    <span class="deal-code">${deal.code}</span>
+                                    <button class="copy-btn" onclick="copyCode('${deal.code}')">Copy</button>
+                                </div>
+                            ` : ''}
+                            <div class="deal-footer">
+                                <span class="deal-expiry">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <polyline points="12 6 12 12 16 14"/>
+                                    </svg>
+                                    ${deal.end_date ? `Expires ${new Date(deal.end_date).toLocaleDateString()}` : 'Limited time'}
+                                </span>
+                                <a href="/business/${deal.business_id}" class="view-business">View Business →</a>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Animate cards
+                gsap.to('.deal-card', {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.5,
+                    stagger: 0.08,
+                    ease: 'power2.out'
+                });
+            } catch (error) {
+                console.error('Error:', error);
+                grid.innerHTML = '<p style="text-align: center; color: var(--text-secondary); grid-column: 1 / -1;">Error loading deals</p>';
+            }
+        }
+
+        function formatDiscount(deal) {
+            if (deal.discount_type === 'percentage') return `${deal.discount_value}% OFF`;
+            if (deal.discount_type === 'fixed') return `$${deal.discount_value} OFF`;
+            if (deal.discount_type === 'bogo') return 'BOGO';
+            return 'SPECIAL';
+        }
+
+        function formatCategory(category) {
+            const names = {
+                'food': 'Food',
+                'retail': 'Retail',
+                'services': 'Services',
+                'entertainment': 'Entertainment',
+                'health': 'Health'
+            };
+            return names[category] || category;
+        }
+
+        function copyCode(code) {
+            navigator.clipboard.writeText(code);
+            alert(`Code "${code}" copied to clipboard!`);
+        }
+
+        // Filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentCategory = btn.dataset.category;
+                fetchDeals();
+            });
+        });
+
+        fetchDeals();
+    </script>
+</body>
+</html>

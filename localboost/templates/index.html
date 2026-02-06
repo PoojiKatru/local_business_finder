@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalBoost | Discover Local Businesses</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Three.js for 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- GSAP for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        /* ==========================================
+           CSS VARIABLES - Design System
+           ========================================== */
+        :root {
+            /* Sleek, sophisticated color palette inspired by Apple */
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --bg-tertiary: #1a1a1a;
+            --bg-card: #1f1f1f;
+            --bg-card-hover: #262626;
+
+            /* Accent colors - warm coral/orange gradient */
+            --accent-primary: #ff6b35;
+            --accent-secondary: #f7931e;
+            --accent-gradient: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+
+            /* Text colors */
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1a1;
+            --text-tertiary: #6b6b6b;
+
+            /* Borders */
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-accent: rgba(255, 107, 53, 0.3);
+
+            /* Shadows */
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
+            --shadow-glow: 0 0 40px rgba(255, 107, 53, 0.15);
+
+            /* Typography */
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+            /* Spacing */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-2xl: 48px;
+            --space-3xl: 64px;
+            --space-4xl: 96px;
+
+            /* Border radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --radius-full: 9999px;
+
+            /* Transitions */
+            --transition-fast: 0.15s ease;
+            --transition-base: 0.3s ease;
+            --transition-slow: 0.5s ease;
+        }
+
+        /* ==========================================
+           RESET & BASE STYLES
+           ========================================== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ==========================================
+           3D INTRO OVERLAY
+           ========================================== */
+        #intro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 10000;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        #three-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .intro-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .intro-logo {
+            font-size: 72px;
+            font-weight: 800;
+            letter-spacing: -3px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: var(--space-md);
+        }
+
+        .intro-tagline {
+            font-size: 20px;
+            font-weight: 400;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+        }
+
+        .intro-enter-btn {
+            margin-top: var(--space-xl);
+            padding: var(--space-md) var(--space-xl);
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            background: var(--accent-gradient);
+            border: none;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .intro-enter-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 60px rgba(255, 107, 53, 0.3);
+        }
+
+        /* ==========================================
+           NAVIGATION
+           ========================================== */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: var(--space-md) var(--space-xl);
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-subtle);
+            opacity: 0;
+            transform: translateY(-100%);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: var(--space-lg);
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color var(--transition-fast);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-gradient);
+            transition: width var(--transition-base);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-cta {
+            padding: var(--space-sm) var(--space-lg);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            background: var(--accent-gradient);
+            border: none;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        /* ==========================================
+           MAIN CONTENT
+           ========================================== */
+        .main-content {
+            opacity: 0;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: var(--space-4xl) var(--space-xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg-gradient {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150%;
+            height: 100%;
+            background: radial-gradient(ellipse at center top, rgba(255, 107, 53, 0.08) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-full);
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-xl);
+        }
+
+        .hero-badge-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .hero-title {
+            font-size: clamp(48px, 8vw, 80px);
+            font-weight: 800;
+            letter-spacing: -3px;
+            line-height: 1.05;
+            margin-bottom: var(--space-lg);
+        }
+
+        .hero-title-gradient {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto var(--space-2xl);
+            line-height: 1.7;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-md) var(--space-xl);
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: var(--radius-full);
+            transition: all var(--transition-base);
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            color: var(--text-primary);
+            background: var(--accent-gradient);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 60px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn-secondary {
+            color: var(--text-primary);
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-accent);
+        }
+
+        /* ==========================================
+           SCROLL SECTIONS
+           ========================================== */
+        .section {
+            padding: var(--space-4xl) var(--space-xl);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: var(--space-3xl);
+        }
+
+        .section-label {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-primary);
+            margin-bottom: var(--space-md);
+        }
+
+        .section-title {
+            font-size: clamp(36px, 5vw, 56px);
+            font-weight: 700;
+            letter-spacing: -2px;
+            margin-bottom: var(--space-md);
+        }
+
+        .section-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: var(--space-lg);
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            transition: all var(--transition-base);
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--border-accent);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent-gradient);
+            border-radius: var(--radius-md);
+            font-size: 24px;
+            margin-bottom: var(--space-lg);
+        }
+
+        .feature-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: var(--space-sm);
+        }
+
+        .feature-desc {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        /* Categories Section */
+        .categories-scroll {
+            display: flex;
+            gap: var(--space-md);
+            overflow-x: auto;
+            padding: var(--space-md) 0;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .categories-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-card {
+            flex-shrink: 0;
+            width: 280px;
+            height: 360px;
+            position: relative;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            cursor: pointer;
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        .category-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform var(--transition-slow);
+        }
+
+        .category-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .category-card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 60%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: var(--space-xl);
+        }
+
+        .category-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: var(--space-xs);
+        }
+
+        .category-count {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Stats Section */
+        .stats-section {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-subtle);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-xl);
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .stat-item {
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .stat-number {
+            font-size: clamp(48px, 6vw, 72px);
+            font-weight: 800;
+            letter-spacing: -2px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-top: var(--space-sm);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: var(--space-4xl) var(--space-xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 107, 53, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-title {
+            font-size: clamp(36px, 5vw, 56px);
+            font-weight: 700;
+            letter-spacing: -2px;
+            margin-bottom: var(--space-md);
+        }
+
+        .cta-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-xl);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-subtle);
+            padding: var(--space-3xl) var(--space-xl);
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr repeat(3, 1fr);
+            gap: var(--space-2xl);
+        }
+
+        @media (max-width: 768px) {
+            .footer-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .footer-brand {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: var(--space-md);
+        }
+
+        .footer-desc {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .footer-title {
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: var(--space-lg);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: var(--space-sm);
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color var(--transition-fast);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-primary);
+        }
+
+        .footer-bottom {
+            max-width: 1400px;
+            margin: var(--space-2xl) auto 0;
+            padding-top: var(--space-xl);
+            border-top: 1px solid var(--border-subtle);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+
+        /* ==========================================
+           RESPONSIVE
+           ========================================== */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .intro-logo {
+                font-size: 48px;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ==========================================
+           CUSTOM SCROLLBAR
+           ========================================== */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-card);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--bg-card-hover);
+        }
+    </style>
+</head>
+<body>
+    <!-- 3D Intro Overlay -->
+    <div id="intro-overlay">
+        <canvas id="three-canvas"></canvas>
+        <div class="intro-content">
+            <div class="intro-logo">LocalBoost</div>
+            <div class="intro-tagline">Discover. Support. Thrive.</div>
+            <button class="intro-enter-btn" id="enter-site">Enter Experience</button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav" id="main-nav">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">LocalBoost</a>
+            <ul class="nav-links">
+                <li><a href="/explore">Explore</a></li>
+                <li><a href="/deals">Deals</a></li>
+                <li><a href="/favorites">Favorites</a></li>
+                <li><a href="/reports">Reports</a></li>
+                <li><a href="/help">Help</a></li>
+            </ul>
+            <button class="nav-cta" onclick="window.location.href='/explore'">Get Started</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content" id="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-bg-gradient"></div>
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="hero-badge-dot"></span>
+                    Supporting local communities
+                </div>
+                <h1 class="hero-title">
+                    Discover Local<br>
+                    <span class="hero-title-gradient">Businesses</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Connect with unique shops, restaurants, and services in your neighborhood.
+                    Every purchase supports a dream.
+                </p>
+                <div class="hero-buttons">
+                    <a href="/explore" class="btn btn-primary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="M21 21l-4.35-4.35"></path>
+                        </svg>
+                        Explore Now
+                    </a>
+                    <a href="/deals" class="btn btn-secondary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"></path>
+                            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                        </svg>
+                        View Deals
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="section" id="features-section">
+            <div class="section-header">
+                <div class="section-label">Features</div>
+                <h2 class="section-title">Everything You Need</h2>
+                <p class="section-subtitle">
+                    Powerful tools to discover, support, and connect with local businesses in your community.
+                </p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="M21 21l-4.35-4.35"></path>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Smart Search</h3>
+                    <p class="feature-desc">Find businesses by category, name, or location. Our intelligent filters help you discover exactly what you're looking for.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Ratings & Reviews</h3>
+                    <p class="feature-desc">Read authentic reviews from real customers. Share your experiences to help others make informed decisions.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                            <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Save Favorites</h3>
+                    <p class="feature-desc">Bookmark your favorite businesses and create personalized lists. Never lose track of places you love.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"></path>
+                            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Exclusive Deals</h3>
+                    <p class="feature-desc">Access special offers, discounts, and promotions from local businesses. Save money while supporting your community.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Custom Reports</h3>
+                    <p class="feature-desc">Generate detailed analytics and insights. Export customizable reports to understand business trends.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                            <path d="M9 11a4 4 0 100-8 4 4 0 000 8z"></path>
+                            <path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"></path>
+                            <path d="M16 3.13a4 4 0 010 7.75"></path>
+                            <path d="M21 21v-2a4 4 0 00-3-3.85"></path>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Verified Reviews</h3>
+                    <p class="feature-desc">Our CAPTCHA system ensures authentic reviews from real humans, not bots. Trust the feedback you read.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Categories Section -->
+        <section class="section" id="categories-section">
+            <div class="section-header">
+                <div class="section-label">Browse</div>
+                <h2 class="section-title">Explore Categories</h2>
+                <p class="section-subtitle">
+                    Find businesses across diverse categories, from local restaurants to professional services.
+                </p>
+            </div>
+            <div class="categories-scroll">
+                <div class="category-card" data-category="food">
+                    <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600" alt="Food">
+                    <div class="category-card-overlay">
+                        <div class="category-name">Food & Dining</div>
+                        <div class="category-count">Restaurants, cafes, bakeries</div>
+                    </div>
+                </div>
+                <div class="category-card" data-category="retail">
+                    <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600" alt="Retail">
+                    <div class="category-card-overlay">
+                        <div class="category-name">Retail & Shopping</div>
+                        <div class="category-count">Shops, boutiques, stores</div>
+                    </div>
+                </div>
+                <div class="category-card" data-category="services">
+                    <img src="https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600" alt="Services">
+                    <div class="category-card-overlay">
+                        <div class="category-name">Services</div>
+                        <div class="category-count">Salons, repairs, professionals</div>
+                    </div>
+                </div>
+                <div class="category-card" data-category="entertainment">
+                    <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600" alt="Entertainment">
+                    <div class="category-card-overlay">
+                        <div class="category-name">Entertainment</div>
+                        <div class="category-count">Venues, activities, fun</div>
+                    </div>
+                </div>
+                <div class="category-card" data-category="health">
+                    <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600" alt="Health">
+                    <div class="category-card-overlay">
+                        <div class="category-name">Health & Wellness</div>
+                        <div class="category-count">Fitness, wellness, medical</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="section stats-section" id="stats-section">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" data-target="500">0</div>
+                    <div class="stat-label">Local Businesses</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="2500">0</div>
+                    <div class="stat-label">Reviews Written</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="150">0</div>
+                    <div class="stat-label">Active Deals</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="10000">0</div>
+                    <div class="stat-label">Happy Users</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <div class="cta-glow"></div>
+            <div class="cta-content">
+                <h2 class="cta-title">Ready to Explore?</h2>
+                <p class="cta-subtitle">Start discovering amazing local businesses in your community today.</p>
+                <a href="/explore" class="btn btn-primary">Start Exploring</a>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-container">
+                <div>
+                    <div class="footer-brand">LocalBoost</div>
+                    <p class="footer-desc">
+                        Connecting communities with local businesses since 2024.
+                        Every purchase supports a local dream.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="footer-title">Explore</h4>
+                    <ul class="footer-links">
+                        <li><a href="/explore">All Businesses</a></li>
+                        <li><a href="/explore?category=food">Food & Dining</a></li>
+                        <li><a href="/explore?category=retail">Retail</a></li>
+                        <li><a href="/explore?category=services">Services</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="footer-title">Features</h4>
+                    <ul class="footer-links">
+                        <li><a href="/deals">Deals & Coupons</a></li>
+                        <li><a href="/favorites">My Favorites</a></li>
+                        <li><a href="/reports">Reports</a></li>
+                        <li><a href="/help">Help Center</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="footer-title">Support</h4>
+                    <ul class="footer-links">
+                        <li><a href="/help">FAQ</a></li>
+                        <li><a href="/help">Contact Us</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2024 LocalBoost. Built with community in mind.</span>
+                <span>Made with passion for local businesses</span>
+            </div>
+        </footer>
+    </main>
+
+    <!-- Three.js 3D Animation Script -->
+    <script>
+        // ==========================================
+        // THREE.JS 3D INTRO ANIMATION
+        // ==========================================
+
+        let scene, camera, renderer, particles, geometries = [];
+        const canvas = document.getElementById('three-canvas');
+
+        function initThree() {
+            // Scene setup
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 50;
+
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            // Create floating geometric shapes
+            const colors = [0xff6b35, 0xf7931e, 0xff8c42, 0xffa557];
+
+            // Create particle system
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 2000;
+            const posArray = new Float32Array(particlesCount * 3);
+
+            for (let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 200;
+            }
+
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.5,
+                color: 0xff6b35,
+                transparent: true,
+                opacity: 0.6,
+                blending: THREE.AdditiveBlending
+            });
+
+            particles = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particles);
+
+            // Create floating 3D shapes
+            const shapes = [
+                new THREE.IcosahedronGeometry(8, 0),
+                new THREE.OctahedronGeometry(6, 0),
+                new THREE.TetrahedronGeometry(7, 0),
+                new THREE.DodecahedronGeometry(5, 0)
+            ];
+
+            shapes.forEach((geo, i) => {
+                const material = new THREE.MeshBasicMaterial({
+                    color: colors[i],
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.4
+                });
+
+                const mesh = new THREE.Mesh(geo, material);
+                mesh.position.x = (Math.random() - 0.5) * 80;
+                mesh.position.y = (Math.random() - 0.5) * 60;
+                mesh.position.z = (Math.random() - 0.5) * 40;
+                mesh.rotation.x = Math.random() * Math.PI;
+                mesh.rotation.y = Math.random() * Math.PI;
+
+                geometries.push(mesh);
+                scene.add(mesh);
+            });
+
+            // Create floating torus
+            const torusGeo = new THREE.TorusGeometry(15, 3, 16, 100);
+            const torusMat = new THREE.MeshBasicMaterial({
+                color: 0xff6b35,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.3
+            });
+            const torus = new THREE.Mesh(torusGeo, torusMat);
+            torus.position.z = -20;
+            geometries.push(torus);
+            scene.add(torus);
+
+            // Create ring
+            const ringGeo = new THREE.RingGeometry(20, 22, 64);
+            const ringMat = new THREE.MeshBasicMaterial({
+                color: 0xf7931e,
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.2
+            });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.position.z = -30;
+            geometries.push(ring);
+            scene.add(ring);
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Rotate particles
+            particles.rotation.x += 0.0003;
+            particles.rotation.y += 0.0005;
+
+            // Animate geometries
+            geometries.forEach((geo, i) => {
+                geo.rotation.x += 0.003 + (i * 0.001);
+                geo.rotation.y += 0.002 + (i * 0.001);
+                geo.position.y += Math.sin(Date.now() * 0.001 + i) * 0.02;
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Mouse interaction
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+            mouseY = (e.clientY / window.innerHeight) * 2 - 1;
+
+            if (camera) {
+                gsap.to(camera.position, {
+                    x: mouseX * 5,
+                    y: -mouseY * 5,
+                    duration: 1,
+                    ease: 'power2.out'
+                });
+            }
+        });
+
+        // Initialize Three.js
+        initThree();
+
+        // ==========================================
+        // INTRO ANIMATION
+        // ==========================================
+
+        // Animate intro content
+        gsap.to('.intro-content', {
+            opacity: 1,
+            y: 0,
+            duration: 1.5,
+            delay: 0.5,
+            ease: 'power3.out'
+        });
+
+        // Enter site button
+        document.getElementById('enter-site').addEventListener('click', () => {
+            gsap.to('#intro-overlay', {
+                opacity: 0,
+                duration: 1,
+                ease: 'power2.inOut',
+                onComplete: () => {
+                    document.getElementById('intro-overlay').style.display = 'none';
+                }
+            });
+
+            gsap.to('#main-nav', {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                delay: 0.5,
+                ease: 'power2.out'
+            });
+
+            gsap.to('#main-content', {
+                opacity: 1,
+                duration: 0.8,
+                delay: 0.5,
+                ease: 'power2.out'
+            });
+
+            // Initialize scroll animations
+            initScrollAnimations();
+        });
+
+        // ==========================================
+        // SCROLL ANIMATIONS
+        // ==========================================
+
+        function initScrollAnimations() {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Feature cards animation
+            gsap.utils.toArray('.feature-card').forEach((card, i) => {
+                gsap.to(card, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.8,
+                    delay: i * 0.1,
+                    scrollTrigger: {
+                        trigger: card,
+                        start: 'top 85%',
+                        toggleActions: 'play none none none'
+                    }
+                });
+            });
+
+            // Category cards animation
+            gsap.utils.toArray('.category-card').forEach((card, i) => {
+                gsap.to(card, {
+                    opacity: 1,
+                    scale: 1,
+                    duration: 0.8,
+                    delay: i * 0.15,
+                    scrollTrigger: {
+                        trigger: card,
+                        start: 'top 85%',
+                        toggleActions: 'play none none none'
+                    }
+                });
+            });
+
+            // Stats counter animation
+            gsap.utils.toArray('.stat-item').forEach((stat, i) => {
+                const numberEl = stat.querySelector('.stat-number');
+                const target = parseInt(numberEl.dataset.target);
+
+                gsap.to(stat, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.8,
+                    delay: i * 0.15,
+                    scrollTrigger: {
+                        trigger: stat,
+                        start: 'top 85%',
+                        toggleActions: 'play none none none',
+                        onEnter: () => {
+                            // Animate counter
+                            gsap.to({ val: 0 }, {
+                                val: target,
+                                duration: 2,
+                                ease: 'power2.out',
+                                onUpdate: function() {
+                                    numberEl.textContent = Math.floor(this.targets()[0].val).toLocaleString() + '+';
+                                }
+                            });
+                        }
+                    }
+                });
+            });
+
+            // Parallax effect on hero
+            gsap.to('.hero-bg-gradient', {
+                y: 200,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: '.hero',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: true
+                }
+            });
+        }
+
+        // Category card click
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const category = card.dataset.category;
+                window.location.href = `/explore?category=${category}`;
+            });
+        });
+    </script>
+</body>
+</html>

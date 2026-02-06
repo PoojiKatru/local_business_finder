@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Businesses | LocalBoost</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        /* ==========================================
+           CSS VARIABLES
+           ========================================== */
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --bg-tertiary: #1a1a1a;
+            --bg-card: #1f1f1f;
+            --bg-card-hover: #262626;
+            --accent-primary: #ff6b35;
+            --accent-secondary: #f7931e;
+            --accent-gradient: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1a1;
+            --text-tertiary: #6b6b6b;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-accent: rgba(255, 107, 53, 0.3);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
+            --shadow-glow: 0 0 40px rgba(255, 107, 53, 0.15);
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --radius-full: 9999px;
+            --transition-fast: 0.15s ease;
+            --transition-base: 0.3s ease;
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 16px 32px;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color var(--transition-fast);
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--text-primary);
+        }
+
+        /* Main Layout */
+        .main-container {
+            padding-top: 80px;
+            display: flex;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            position: sticky;
+            top: 80px;
+            height: calc(100vh - 80px);
+            padding: 32px 24px;
+            border-right: 1px solid var(--border-subtle);
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            margin-bottom: 32px;
+        }
+
+        .sidebar-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-tertiary);
+            margin-bottom: 16px;
+        }
+
+        /* Search */
+        .search-container {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 16px 14px 44px;
+            font-size: 14px;
+            font-family: var(--font-main);
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            transition: all var(--transition-base);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+        }
+
+        /* Category Filters */
+        .category-filters {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .category-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            text-align: left;
+        }
+
+        .category-btn:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .category-btn.active {
+            background: var(--accent-gradient);
+            color: var(--text-primary);
+        }
+
+        .category-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .category-count {
+            margin-left: auto;
+            font-size: 12px;
+            color: var(--text-tertiary);
+            background: var(--bg-card);
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+        }
+
+        .category-btn.active .category-count {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
+        }
+
+        /* Sort Options */
+        .sort-select {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-family: var(--font-main);
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a1a1a1' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+        }
+
+        .sort-select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            padding: 32px;
+        }
+
+        .content-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+
+        .content-title {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .results-count {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Business Grid */
+        .business-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        /* Business Card */
+        .business-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transition: all var(--transition-base);
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .business-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--border-accent);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .business-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            transition: transform var(--transition-base);
+        }
+
+        .business-card:hover .business-image {
+            transform: scale(1.05);
+        }
+
+        .business-image-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .business-category-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius-full);
+            color: var(--text-primary);
+        }
+
+        .business-deal-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            background: var(--accent-gradient);
+            border-radius: var(--radius-full);
+            color: var(--text-primary);
+        }
+
+        .business-favorite-btn {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            color: var(--text-primary);
+        }
+
+        .business-favorite-btn:hover {
+            background: var(--accent-primary);
+            transform: scale(1.1);
+        }
+
+        .business-favorite-btn.active {
+            background: var(--accent-primary);
+        }
+
+        .business-content {
+            padding: 20px;
+        }
+
+        .business-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .business-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.6;
+        }
+
+        .business-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .business-rating {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .rating-stars {
+            display: flex;
+            gap: 2px;
+        }
+
+        .star {
+            color: #fbbf24;
+        }
+
+        .star.empty {
+            color: var(--text-tertiary);
+        }
+
+        .rating-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .rating-count {
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+
+        .business-address {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-tertiary);
+            margin-top: 12px;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 64px;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid var(--border-subtle);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 64px;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-card);
+            border-radius: 50%;
+            color: var(--text-tertiary);
+        }
+
+        .empty-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .empty-desc {
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .mobile-filters {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .business-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content {
+                padding: 16px;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-card);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">LocalBoost</a>
+            <ul class="nav-links">
+                <li><a href="/explore" class="active">Explore</a></li>
+                <li><a href="/deals">Deals</a></li>
+                <li><a href="/favorites">Favorites</a></li>
+                <li><a href="/reports">Reports</a></li>
+                <li><a href="/help">Help</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- Search -->
+            <div class="search-container">
+                <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="M21 21l-4.35-4.35"></path>
+                </svg>
+                <input type="text" class="search-input" id="search-input" placeholder="Search businesses...">
+            </div>
+
+            <!-- Categories -->
+            <div class="sidebar-section">
+                <div class="sidebar-title">Categories</div>
+                <div class="category-filters" id="category-filters">
+                    <button class="category-btn active" data-category="all">
+                        <span class="category-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="14" width="7" height="7"></rect>
+                                <rect x="3" y="14" width="7" height="7"></rect>
+                            </svg>
+                        </span>
+                        All Categories
+                        <span class="category-count" id="count-all">0</span>
+                    </button>
+                    <button class="category-btn" data-category="food">
+                        <span class="category-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 8h1a4 4 0 010 8h-1"></path>
+                                <path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"></path>
+                                <line x1="6" y1="1" x2="6" y2="4"></line>
+                                <line x1="10" y1="1" x2="10" y2="4"></line>
+                                <line x1="14" y1="1" x2="14" y2="4"></line>
+                            </svg>
+                        </span>
+                        Food & Dining
+                        <span class="category-count" id="count-food">0</span>
+                    </button>
+                    <button class="category-btn" data-category="retail">
+                        <span class="category-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="9" cy="21" r="1"></circle>
+                                <circle cx="20" cy="21" r="1"></circle>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"></path>
+                            </svg>
+                        </span>
+                        Retail & Shopping
+                        <span class="category-count" id="count-retail">0</span>
+                    </button>
+                    <button class="category-btn" data-category="services">
+                        <span class="category-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"></path>
+                            </svg>
+                        </span>
+                        Services
+                        <span class="category-count" id="count-services">0</span>
+                    </button>
+                    <button class="category-btn" data-category="entertainment">
+                        <span class="category-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polygon points="10 8 16 12 10 16 10 8"></polygon>
+                            </svg>
+                        </span>
+                        Entertainment
+                        <span class="category-count" id="count-entertainment">0</span>
+                    </button>
+                    <button class="category-btn" data-category="health">
+                        <span class="category-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"></path>
+                            </svg>
+                        </span>
+                        Health & Wellness
+                        <span class="category-count" id="count-health">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sort -->
+            <div class="sidebar-section">
+                <div class="sidebar-title">Sort By</div>
+                <select class="sort-select" id="sort-select">
+                    <option value="rating">Highest Rated</option>
+                    <option value="reviews">Most Reviewed</option>
+                    <option value="name">Name (A-Z)</option>
+                    <option value="newest">Newest First</option>
+                </select>
+            </div>
+        </aside>
+
+        <!-- Content -->
+        <main class="content">
+            <div class="content-header">
+                <h1 class="content-title">Explore Businesses</h1>
+                <span class="results-count" id="results-count">Loading...</span>
+            </div>
+
+            <div class="business-grid" id="business-grid">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ==========================================
+        // STATE
+        // ==========================================
+        let businesses = [];
+        let currentCategory = 'all';
+        let currentSort = 'rating';
+        let searchQuery = '';
+        let favorites = new Set();
+
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+        async function init() {
+            // Get URL params
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoryParam = urlParams.get('category');
+            if (categoryParam) {
+                currentCategory = categoryParam;
+                updateCategoryButtons();
+            }
+
+            // Load favorites from localStorage
+            const storedFavorites = localStorage.getItem('localboost_favorites');
+            if (storedFavorites) {
+                favorites = new Set(JSON.parse(storedFavorites));
+            }
+
+            // Fetch categories
+            await fetchCategories();
+
+            // Fetch businesses
+            await fetchBusinesses();
+
+            // Set up event listeners
+            setupEventListeners();
+        }
+
+        // ==========================================
+        // API CALLS
+        // ==========================================
+        async function fetchCategories() {
+            try {
+                const response = await fetch('/api/categories');
+                const categories = await response.json();
+
+                let total = 0;
+                categories.forEach(cat => {
+                    total += cat.count;
+                    const countEl = document.getElementById(`count-${cat.name}`);
+                    if (countEl) {
+                        countEl.textContent = cat.count;
+                    }
+                });
+
+                document.getElementById('count-all').textContent = total;
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            }
+        }
+
+        async function fetchBusinesses() {
+            const grid = document.getElementById('business-grid');
+            grid.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+            try {
+                let url = `/api/businesses?sort=${currentSort}`;
+                if (currentCategory !== 'all') {
+                    url += `&category=${currentCategory}`;
+                }
+                if (searchQuery) {
+                    url += `&search=${encodeURIComponent(searchQuery)}`;
+                }
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                businesses = data.businesses;
+                renderBusinesses();
+                updateResultsCount(data.total);
+            } catch (error) {
+                console.error('Error fetching businesses:', error);
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                        </div>
+                        <h3 class="empty-title">Error loading businesses</h3>
+                        <p class="empty-desc">Please try again later.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // ==========================================
+        // RENDERING
+        // ==========================================
+        function renderBusinesses() {
+            const grid = document.getElementById('business-grid');
+
+            if (businesses.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="M21 21l-4.35-4.35"></path>
+                            </svg>
+                        </div>
+                        <h3 class="empty-title">No businesses found</h3>
+                        <p class="empty-desc">Try adjusting your search or filters.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = businesses.map(business => `
+                <div class="business-card" data-id="${business.id}" onclick="viewBusiness(${business.id})">
+                    <div class="business-image-container">
+                        <img class="business-image" src="${business.image_url || 'https://via.placeholder.com/400x200'}" alt="${business.name}">
+                        <span class="business-category-badge">${formatCategory(business.category)}</span>
+                        ${business.has_deals ? '<span class="business-deal-badge">Deal Available</span>' : ''}
+                        <button class="business-favorite-btn ${favorites.has(business.id) ? 'active' : ''}" onclick="toggleFavorite(event, ${business.id})">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="${favorites.has(business.id) ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                                <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="business-content">
+                        <h3 class="business-name">${business.name}</h3>
+                        <p class="business-description">${business.description}</p>
+                        <div class="business-meta">
+                            <div class="business-rating">
+                                <div class="rating-stars">${renderStars(business.average_rating)}</div>
+                                <span class="rating-value">${business.average_rating.toFixed(1)}</span>
+                                <span class="rating-count">(${business.review_count})</span>
+                            </div>
+                        </div>
+                        <div class="business-address">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            ${business.address}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Animate cards
+            gsap.to('.business-card', {
+                opacity: 1,
+                y: 0,
+                duration: 0.5,
+                stagger: 0.05,
+                ease: 'power2.out'
+            });
+        }
+
+        function renderStars(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    stars += '<svg class="star" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>';
+                } else {
+                    stars += '<svg class="star empty" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>';
+                }
+            }
+            return stars;
+        }
+
+        function formatCategory(category) {
+            const categoryNames = {
+                'food': 'Food & Dining',
+                'retail': 'Retail',
+                'services': 'Services',
+                'entertainment': 'Entertainment',
+                'health': 'Health & Wellness'
+            };
+            return categoryNames[category] || category;
+        }
+
+        function updateResultsCount(total) {
+            document.getElementById('results-count').textContent = `${total} businesses found`;
+        }
+
+        function updateCategoryButtons() {
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.category === currentCategory);
+            });
+        }
+
+        // ==========================================
+        // EVENT HANDLERS
+        // ==========================================
+        function setupEventListeners() {
+            // Category filters
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentCategory = btn.dataset.category;
+                    updateCategoryButtons();
+                    fetchBusinesses();
+                });
+            });
+
+            // Sort select
+            document.getElementById('sort-select').addEventListener('change', (e) => {
+                currentSort = e.target.value;
+                fetchBusinesses();
+            });
+
+            // Search input
+            let searchTimeout;
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    searchQuery = e.target.value;
+                    fetchBusinesses();
+                }, 300);
+            });
+        }
+
+        function viewBusiness(id) {
+            window.location.href = `/business/${id}`;
+        }
+
+        function toggleFavorite(event, businessId) {
+            event.stopPropagation();
+
+            const btn = event.currentTarget;
+            const svg = btn.querySelector('svg');
+
+            if (favorites.has(businessId)) {
+                favorites.delete(businessId);
+                btn.classList.remove('active');
+                svg.setAttribute('fill', 'none');
+
+                // Remove from server
+                fetch(`/api/favorites/${businessId}`, { method: 'DELETE' });
+            } else {
+                favorites.add(businessId);
+                btn.classList.add('active');
+                svg.setAttribute('fill', 'currentColor');
+
+                // Add to server
+                fetch('/api/favorites', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ business_id: businessId })
+                });
+            }
+
+            // Save to localStorage
+            localStorage.setItem('localboost_favorites', JSON.stringify([...favorites]));
+
+            // Animate
+            gsap.fromTo(btn, { scale: 1.3 }, { scale: 1, duration: 0.3, ease: 'back.out' });
+        }
+
+        // Initialize
+        init();
+    </script>
+</body>
+</html>

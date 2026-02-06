@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ business.name }} | LocalBoost</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --bg-card: #1f1f1f;
+            --bg-card-hover: #262626;
+            --accent-primary: #ff6b35;
+            --accent-secondary: #f7931e;
+            --accent-gradient: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1a1;
+            --text-tertiary: #6b6b6b;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-accent: rgba(255, 107, 53, 0.3);
+            --shadow-glow: 0 0 40px rgba(255, 107, 53, 0.15);
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-full: 9999px;
+            --transition-base: 0.3s ease;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 16px 32px;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            font-size: 24px;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.15s ease;
+        }
+
+        .nav-links a:hover { color: var(--text-primary); }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-full);
+            text-decoration: none;
+            transition: all var(--transition-base);
+        }
+
+        .back-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--border-accent);
+        }
+
+        /* Hero */
+        .hero-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            margin-top: 64px;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Business Header */
+        .business-header {
+            display: flex;
+            gap: 32px;
+            margin-top: -80px;
+            position: relative;
+            z-index: 10;
+            background: var(--bg-primary);
+            padding: 32px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .business-info { flex: 1; }
+
+        .business-category {
+            display: inline-block;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: var(--accent-gradient);
+            border-radius: var(--radius-full);
+            margin-bottom: 16px;
+        }
+
+        .business-name {
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 16px;
+        }
+
+        .business-rating-large {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .rating-stars-large {
+            display: flex;
+            gap: 4px;
+            color: #fbbf24;
+        }
+
+        .rating-value-large {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .rating-count-large {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        .business-description {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        .business-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: var(--radius-full);
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            color: var(--text-primary);
+            background: var(--accent-gradient);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 60px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn-secondary {
+            color: var(--text-primary);
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-accent);
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 32px;
+            margin-top: 48px;
+            padding-bottom: 64px;
+        }
+
+        @media (max-width: 900px) {
+            .content-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Section Cards */
+        .section-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title svg { color: var(--accent-primary); }
+
+        /* Deals */
+        .deal-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-accent);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .deal-item:last-child { margin-bottom: 0; }
+
+        .deal-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            border-radius: var(--radius-full);
+            margin-bottom: 12px;
+        }
+
+        .deal-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .deal-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .deal-code {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-card);
+            border: 1px dashed var(--border-accent);
+            border-radius: var(--radius-sm);
+            font-family: monospace;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .deal-code:hover { background: var(--bg-card-hover); }
+
+        .deal-expiry {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-top: 12px;
+        }
+
+        /* Reviews */
+        .reviews-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .review-item {
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .review-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .review-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .review-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .review-meta {
+            flex: 1;
+        }
+
+        .review-author {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .review-date {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .review-stars {
+            display: flex;
+            gap: 2px;
+            color: #fbbf24;
+        }
+
+        .review-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .review-content {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Review Form */
+        .review-form {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-family: var(--font-main);
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            transition: all var(--transition-base);
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .rating-input {
+            display: flex;
+            gap: 8px;
+        }
+
+        .rating-star {
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            color: var(--text-tertiary);
+            transition: all 0.15s ease;
+        }
+
+        .rating-star:hover, .rating-star.active {
+            color: #fbbf24;
+            transform: scale(1.1);
+        }
+
+        /* CAPTCHA */
+        .captcha-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 20px;
+        }
+
+        .captcha-question {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .captcha-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            text-align: center;
+            font-family: var(--font-main);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+        }
+
+        .captcha-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .captcha-refresh {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 12px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .captcha-refresh:hover { color: var(--accent-primary); }
+
+        /* Contact Info */
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .contact-item:last-child { border-bottom: none; }
+
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            color: var(--accent-primary);
+        }
+
+        .contact-label {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-bottom: 2px;
+        }
+
+        .contact-value {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .contact-value a {
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .contact-value a:hover { color: var(--accent-primary); }
+
+        /* Hours */
+        .hours-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .hours-item:last-child { border-bottom: none; }
+
+        .hours-day { color: var(--text-secondary); }
+
+        .hours-time { font-weight: 500; }
+
+        .hours-time.closed { color: var(--accent-primary); }
+
+        /* Alert */
+        .alert {
+            padding: 16px;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        .hidden { display: none; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .business-header {
+                flex-direction: column;
+                margin-top: -40px;
+            }
+
+            .business-name { font-size: 28px; }
+
+            .business-actions { flex-direction: column; }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--bg-card); border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">LocalBoost</a>
+            <ul class="nav-links">
+                <li><a href="/explore">Explore</a></li>
+                <li><a href="/deals">Deals</a></li>
+                <li><a href="/favorites">Favorites</a></li>
+                <li><a href="/reports">Reports</a></li>
+                <li><a href="/help">Help</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Image -->
+    <img class="hero-image" src="{{ business.image_url or 'https://via.placeholder.com/1200x400' }}" alt="{{ business.name }}">
+
+    <div class="container">
+        <!-- Business Header -->
+        <div class="business-header">
+            <div class="business-info">
+                <a href="/explore" class="back-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Back to Explore
+                </a>
+                <div style="margin-top: 20px;">
+                    <span class="business-category">{{ business.category }}</span>
+                    <h1 class="business-name">{{ business.name }}</h1>
+                    <div class="business-rating-large">
+                        <div class="rating-stars-large" id="header-stars"></div>
+                        <span class="rating-value-large" id="header-rating">0.0</span>
+                        <span class="rating-count-large" id="header-reviews">(0 reviews)</span>
+                    </div>
+                    <p class="business-description">{{ business.description }}</p>
+                    <div class="business-actions">
+                        <button class="btn btn-primary" id="favorite-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+                            </svg>
+                            <span id="favorite-text">Add to Favorites</span>
+                        </button>
+                        <a href="#reviews" class="btn btn-secondary">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                            </svg>
+                            Write a Review
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="content-grid">
+            <!-- Main Content -->
+            <div class="main-column">
+                <!-- Deals Section -->
+                <div class="section-card" id="deals-section">
+                    <h2 class="section-title">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
+                            <line x1="7" y1="7" x2="7.01" y2="7"/>
+                        </svg>
+                        Special Deals
+                    </h2>
+                    <div id="deals-container">
+                        <p style="color: var(--text-secondary);">Loading deals...</p>
+                    </div>
+                </div>
+
+                <!-- Reviews Section -->
+                <div class="section-card" id="reviews">
+                    <div class="reviews-header">
+                        <h2 class="section-title">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                            </svg>
+                            Reviews
+                        </h2>
+                    </div>
+
+                    <!-- Review Form -->
+                    <div class="review-form">
+                        <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 20px;">Write a Review</h3>
+
+                        <div id="form-alert" class="hidden"></div>
+
+                        <div class="form-group">
+                            <label class="form-label">Your Rating</label>
+                            <div class="rating-input" id="rating-input">
+                                <svg class="rating-star" data-rating="1" viewBox="0 0 24 24" fill="currentColor">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                </svg>
+                                <svg class="rating-star" data-rating="2" viewBox="0 0 24 24" fill="currentColor">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                </svg>
+                                <svg class="rating-star" data-rating="3" viewBox="0 0 24 24" fill="currentColor">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                </svg>
+                                <svg class="rating-star" data-rating="4" viewBox="0 0 24 24" fill="currentColor">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                </svg>
+                                <svg class="rating-star" data-rating="5" viewBox="0 0 24 24" fill="currentColor">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Review Title (Optional)</label>
+                            <input type="text" class="form-input" id="review-title" placeholder="Summarize your experience">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Your Review</label>
+                            <textarea class="form-textarea" id="review-content" placeholder="Share your experience with this business..."></textarea>
+                        </div>
+
+                        <!-- CAPTCHA -->
+                        <div class="form-group">
+                            <label class="form-label">Verification (to prevent bots)</label>
+                            <div class="captcha-container">
+                                <p class="captcha-question" id="captcha-question">Loading...</p>
+                                <input type="text" class="captcha-input" id="captcha-answer" placeholder="Your answer">
+                                <button class="captcha-refresh" id="captcha-refresh">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M23 4v6h-6M1 20v-6h6"/>
+                                        <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+                                    </svg>
+                                    New question
+                                </button>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary" id="submit-review" style="width: 100%;">
+                            Submit Review
+                        </button>
+                    </div>
+
+                    <!-- Reviews List -->
+                    <div id="reviews-container" style="margin-top: 32px;">
+                        <p style="color: var(--text-secondary);">Loading reviews...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar-column">
+                <!-- Contact Info -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+                        </svg>
+                        Contact
+                    </h2>
+                    <div id="contact-container">
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                                    <circle cx="12" cy="10" r="3"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="contact-label">Address</div>
+                                <div class="contact-value">{{ business.address }}</div>
+                            </div>
+                        </div>
+                        {% if business.phone %}
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="contact-label">Phone</div>
+                                <div class="contact-value"><a href="tel:{{ business.phone }}">{{ business.phone }}</a></div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if business.email %}
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                    <polyline points="22,6 12,13 2,6"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="contact-label">Email</div>
+                                <div class="contact-value"><a href="mailto:{{ business.email }}">{{ business.email }}</a></div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if business.website %}
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="2" y1="12" x2="22" y2="12"/>
+                                    <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="contact-label">Website</div>
+                                <div class="contact-value"><a href="{{ business.website }}" target="_blank">Visit Website</a></div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Hours -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        Hours
+                    </h2>
+                    <div id="hours-container">
+                        <p style="color: var(--text-secondary);">Loading hours...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const businessId = {{ business.id }};
+        let businessData = null;
+        let selectedRating = 0;
+        let captchaId = null;
+
+        // Initialize
+        async function init() {
+            await fetchBusinessData();
+            await loadCaptcha();
+            setupEventListeners();
+            checkFavoriteStatus();
+        }
+
+        // Fetch business data
+        async function fetchBusinessData() {
+            try {
+                const response = await fetch(`/api/businesses/${businessId}`);
+                businessData = await response.json();
+                renderBusinessData();
+            } catch (error) {
+                console.error('Error fetching business:', error);
+            }
+        }
+
+        // Render business data
+        function renderBusinessData() {
+            // Header rating
+            document.getElementById('header-stars').innerHTML = renderStars(businessData.average_rating);
+            document.getElementById('header-rating').textContent = businessData.average_rating.toFixed(1);
+            document.getElementById('header-reviews').textContent = `(${businessData.review_count} reviews)`;
+
+            // Deals
+            const dealsContainer = document.getElementById('deals-container');
+            if (businessData.deals && businessData.deals.length > 0) {
+                dealsContainer.innerHTML = businessData.deals.map(deal => `
+                    <div class="deal-item">
+                        <span class="deal-badge">${formatDiscount(deal)}</span>
+                        <h4 class="deal-title">${deal.title}</h4>
+                        <p class="deal-description">${deal.description}</p>
+                        ${deal.code ? `
+                            <div class="deal-code" onclick="copyCode('${deal.code}')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                                </svg>
+                                ${deal.code}
+                            </div>
+                        ` : ''}
+                        ${deal.end_date ? `<p class="deal-expiry">Expires: ${new Date(deal.end_date).toLocaleDateString()}</p>` : ''}
+                        ${deal.terms ? `<p class="deal-expiry">${deal.terms}</p>` : ''}
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('deals-section').classList.add('hidden');
+            }
+
+            // Reviews
+            const reviewsContainer = document.getElementById('reviews-container');
+            if (businessData.reviews && businessData.reviews.length > 0) {
+                reviewsContainer.innerHTML = businessData.reviews.map(review => `
+                    <div class="review-item">
+                        <div class="review-header">
+                            <div class="review-avatar">${review.user.charAt(0).toUpperCase()}</div>
+                            <div class="review-meta">
+                                <div class="review-author">${review.user}</div>
+                                <div class="review-date">${new Date(review.created_at).toLocaleDateString()}</div>
+                            </div>
+                            <div class="review-stars">${renderStars(review.rating)}</div>
+                        </div>
+                        ${review.title ? `<div class="review-title">${review.title}</div>` : ''}
+                        <div class="review-content">${review.content}</div>
+                    </div>
+                `).join('');
+            } else {
+                reviewsContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 24px;">No reviews yet. Be the first to review!</p>';
+            }
+
+            // Hours
+            const hoursContainer = document.getElementById('hours-container');
+            if (businessData.hours) {
+                const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+                const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+                hoursContainer.innerHTML = days.map((day, i) => {
+                    const hours = businessData.hours[day];
+                    const isClosed = !hours || hours.toLowerCase() === 'closed';
+                    return `
+                        <div class="hours-item">
+                            <span class="hours-day">${dayNames[i]}</span>
+                            <span class="hours-time ${isClosed ? 'closed' : ''}">${isClosed ? 'Closed' : hours}</span>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                hoursContainer.innerHTML = '<p style="color: var(--text-secondary);">Hours not available</p>';
+            }
+        }
+
+        function renderStars(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                const filled = i <= rating;
+                stars += `<svg width="16" height="16" viewBox="0 0 24 24" fill="${filled ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>`;
+            }
+            return stars;
+        }
+
+        function formatDiscount(deal) {
+            if (deal.discount_type === 'percentage') return `${deal.discount_value}% OFF`;
+            if (deal.discount_type === 'fixed') return `$${deal.discount_value} OFF`;
+            if (deal.discount_type === 'bogo') return 'BOGO';
+            return 'SPECIAL';
+        }
+
+        function copyCode(code) {
+            navigator.clipboard.writeText(code);
+            alert(`Code "${code}" copied to clipboard!`);
+        }
+
+        // CAPTCHA
+        async function loadCaptcha() {
+            try {
+                const response = await fetch('/api/captcha');
+                const data = await response.json();
+                captchaId = data.challenge_id;
+                document.getElementById('captcha-question').textContent = data.question;
+                document.getElementById('captcha-answer').value = '';
+            } catch (error) {
+                console.error('Error loading captcha:', error);
+            }
+        }
+
+        // Event listeners
+        function setupEventListeners() {
+            // Rating stars
+            document.querySelectorAll('.rating-star').forEach(star => {
+                star.addEventListener('click', () => {
+                    selectedRating = parseInt(star.dataset.rating);
+                    updateRatingStars();
+                });
+
+                star.addEventListener('mouseenter', () => {
+                    highlightStars(parseInt(star.dataset.rating));
+                });
+
+                star.addEventListener('mouseleave', () => {
+                    updateRatingStars();
+                });
+            });
+
+            // Captcha refresh
+            document.getElementById('captcha-refresh').addEventListener('click', loadCaptcha);
+
+            // Submit review
+            document.getElementById('submit-review').addEventListener('click', submitReview);
+
+            // Favorite button
+            document.getElementById('favorite-btn').addEventListener('click', toggleFavorite);
+        }
+
+        function highlightStars(rating) {
+            document.querySelectorAll('.rating-star').forEach((star, i) => {
+                star.classList.toggle('active', i < rating);
+            });
+        }
+
+        function updateRatingStars() {
+            highlightStars(selectedRating);
+        }
+
+        async function submitReview() {
+            const title = document.getElementById('review-title').value;
+            const content = document.getElementById('review-content').value;
+            const captchaAnswer = document.getElementById('captcha-answer').value;
+
+            // Validation
+            if (selectedRating === 0) {
+                showAlert('Please select a rating', 'error');
+                return;
+            }
+
+            if (content.length < 10) {
+                showAlert('Review must be at least 10 characters', 'error');
+                return;
+            }
+
+            if (!captchaAnswer) {
+                showAlert('Please complete the verification', 'error');
+                return;
+            }
+
+            // Verify CAPTCHA
+            try {
+                const captchaResponse = await fetch('/api/captcha/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        challenge_id: captchaId,
+                        answer: captchaAnswer
+                    })
+                });
+
+                const captchaResult = await captchaResponse.json();
+
+                if (!captchaResult.success) {
+                    showAlert('Incorrect answer. Please try again.', 'error');
+                    loadCaptcha();
+                    return;
+                }
+
+                // Submit review
+                const reviewResponse = await fetch('/api/reviews', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        business_id: businessId,
+                        rating: selectedRating,
+                        title: title,
+                        content: content
+                    })
+                });
+
+                const reviewResult = await reviewResponse.json();
+
+                if (reviewResult.success) {
+                    showAlert('Review submitted successfully!', 'success');
+                    // Reset form
+                    selectedRating = 0;
+                    updateRatingStars();
+                    document.getElementById('review-title').value = '';
+                    document.getElementById('review-content').value = '';
+                    loadCaptcha();
+                    // Refresh data
+                    await fetchBusinessData();
+                } else {
+                    showAlert(reviewResult.error || 'Error submitting review', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('An error occurred. Please try again.', 'error');
+            }
+        }
+
+        function showAlert(message, type) {
+            const alertEl = document.getElementById('form-alert');
+            alertEl.textContent = message;
+            alertEl.className = `alert alert-${type}`;
+            alertEl.classList.remove('hidden');
+
+            setTimeout(() => {
+                alertEl.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Favorites
+        function checkFavoriteStatus() {
+            const favorites = JSON.parse(localStorage.getItem('localboost_favorites') || '[]');
+            if (favorites.includes(businessId)) {
+                document.getElementById('favorite-btn').classList.add('active');
+                document.getElementById('favorite-text').textContent = 'Saved to Favorites';
+            }
+        }
+
+        async function toggleFavorite() {
+            const btn = document.getElementById('favorite-btn');
+            const text = document.getElementById('favorite-text');
+            let favorites = JSON.parse(localStorage.getItem('localboost_favorites') || '[]');
+
+            if (favorites.includes(businessId)) {
+                favorites = favorites.filter(id => id !== businessId);
+                btn.classList.remove('active');
+                text.textContent = 'Add to Favorites';
+                await fetch(`/api/favorites/${businessId}`, { method: 'DELETE' });
+            } else {
+                favorites.push(businessId);
+                btn.classList.add('active');
+                text.textContent = 'Saved to Favorites';
+                await fetch('/api/favorites', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ business_id: businessId })
+                });
+            }
+
+            localStorage.setItem('localboost_favorites', JSON.stringify(favorites));
+            gsap.fromTo(btn, { scale: 1.1 }, { scale: 1, duration: 0.3, ease: 'back.out' });
+        }
+
+        // Initialize
+        init();
+    </script>
+</body>
+</html>
