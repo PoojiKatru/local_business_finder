@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Favorites | LocalBoost</title>
+    <title>My Favorites | BizFinder</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -333,7 +333,7 @@
 <body>
     <nav class="nav">
         <div class="nav-container">
-            <a href="/" class="nav-logo">LocalBoost</a>
+            <a href="/" class="nav-logo">BizFinder</a>
             <ul class="nav-links">
                 <li><a href="/explore">Explore</a></li>
                 <li><a href="/deals">Deals</a></li>
@@ -456,9 +456,9 @@
                 await fetch(`/api/favorites/${favoriteId}`, { method: 'DELETE' });
 
                 // Update localStorage
-                let favorites = JSON.parse(localStorage.getItem('localboost_favorites') || '[]');
+                let favorites = JSON.parse(localStorage.getItem('BizFinder_favorites') || '[]');
                 favorites = favorites.filter(id => id !== businessId);
-                localStorage.setItem('localboost_favorites', JSON.stringify(favorites));
+                localStorage.setItem('BizFinder_favorites', JSON.stringify(favorites));
 
                 // Animate and remove card
                 const card = document.querySelector(`[data-id="${favoriteId}"]`);
