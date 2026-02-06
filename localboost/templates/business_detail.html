@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ business.name }} | LocalBoost</title>
+    <title>{{ business.name }} | BizFinder</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -597,7 +597,7 @@
     <!-- Navigation -->
     <nav class="nav">
         <div class="nav-container">
-            <a href="/" class="nav-logo">LocalBoost</a>
+            <a href="/" class="nav-logo">BizFinder</a>
             <ul class="nav-links">
                 <li><a href="/explore">Explore</a></li>
                 <li><a href="/deals">Deals</a></li>
@@ -1086,7 +1086,7 @@
 
         // Favorites
         function checkFavoriteStatus() {
-            const favorites = JSON.parse(localStorage.getItem('localboost_favorites') || '[]');
+            const favorites = JSON.parse(localStorage.getItem('bizfinder_favorites') || '[]');
             if (favorites.includes(businessId)) {
                 document.getElementById('favorite-btn').classList.add('active');
                 document.getElementById('favorite-text').textContent = 'Saved to Favorites';
@@ -1096,7 +1096,7 @@
         async function toggleFavorite() {
             const btn = document.getElementById('favorite-btn');
             const text = document.getElementById('favorite-text');
-            let favorites = JSON.parse(localStorage.getItem('localboost_favorites') || '[]');
+            let favorites = JSON.parse(localStorage.getItem('bizfinder_favorites') || '[]');
 
             if (favorites.includes(businessId)) {
                 favorites = favorites.filter(id => id !== businessId);
@@ -1114,7 +1114,7 @@
                 });
             }
 
-            localStorage.setItem('localboost_favorites', JSON.stringify(favorites));
+            localStorage.setItem('bizfinder_favorites', JSON.stringify(favorites));
             gsap.fromTo(btn, { scale: 1.1 }, { scale: 1, duration: 0.3, ease: 'back.out' });
         }
 
