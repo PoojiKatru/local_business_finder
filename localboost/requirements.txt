@@ -1,0 +1,15 @@
+# LocalBoost - Local Business Discovery Platform
+# Python Dependencies
+
+# Web Framework
+Flask==3.0.0
+
+# Database ORM
+Flask-SQLAlchemy==3.1.1
+SQLAlchemy==2.0.23
+
+# Production WSGI Server (optional)
+gunicorn==21.2.0
+
+# For development
+python-dotenv==1.0.0

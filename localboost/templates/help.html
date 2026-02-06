@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Center | LocalBoost</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --bg-card: #1f1f1f;
+            --bg-card-hover: #262626;
+            --accent-primary: #ff6b35;
+            --accent-secondary: #f7931e;
+            --accent-gradient: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1a1;
+            --text-tertiary: #6b6b6b;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-accent: rgba(255, 107, 53, 0.3);
+            --shadow-glow: 0 0 40px rgba(255, 107, 53, 0.15);
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-full: 9999px;
+            --transition-base: 0.3s ease;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 16px 32px;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            font-size: 24px;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover, .nav-links a.active { color: var(--text-primary); }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 120px 24px 64px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .page-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-full);
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .page-badge-icon {
+            color: var(--accent-primary);
+        }
+
+        .page-title {
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: -2px;
+            margin-bottom: 16px;
+        }
+
+        .page-title span {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+        }
+
+        /* Search */
+        .search-container {
+            position: relative;
+            margin-bottom: 48px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 18px 24px 18px 56px;
+            font-size: 16px;
+            font-family: var(--font-main);
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            color: var(--text-primary);
+            transition: all var(--transition-base);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.1);
+        }
+
+        .search-input::placeholder { color: var(--text-tertiary); }
+
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+        }
+
+        /* FAQ Accordion */
+        .faq-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: all var(--transition-base);
+        }
+
+        .faq-item:hover {
+            border-color: var(--border-accent);
+        }
+
+        .faq-item.active {
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .faq-question {
+            width: 100%;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: left;
+            color: var(--text-primary);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .faq-question:hover {
+            color: var(--accent-primary);
+        }
+
+        .faq-icon {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-tertiary);
+            transition: all var(--transition-base);
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+            color: var(--accent-primary);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .faq-answer-content {
+            padding: 0 24px 24px;
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+        }
+
+        /* Interactive Q&A */
+        .qa-section {
+            margin-top: 64px;
+            padding-top: 64px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .qa-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .qa-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .chat-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 16px 24px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-title {
+            font-weight: 600;
+        }
+
+        .chat-status {
+            font-size: 12px;
+            color: #22c55e;
+        }
+
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .message-avatar.bot {
+            background: var(--accent-gradient);
+        }
+
+        .message-avatar.user {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-sender {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .message-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            background: var(--bg-secondary);
+            padding: 14px 18px;
+            border-radius: var(--radius-md);
+        }
+
+        .message.user .message-text {
+            background: var(--accent-primary);
+            color: var(--text-primary);
+        }
+
+        .chat-input-container {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-subtle);
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 14px 18px;
+            font-size: 14px;
+            font-family: var(--font-main);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .chat-send {
+            padding: 14px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            background: var(--accent-gradient);
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .chat-send:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        /* Quick Links */
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 48px;
+        }
+
+        @media (max-width: 768px) {
+            .quick-links { grid-template-columns: 1fr; }
+        }
+
+        .quick-link {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            text-decoration: none;
+            transition: all var(--transition-base);
+        }
+
+        .quick-link:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-accent);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .quick-link-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent-gradient);
+            border-radius: var(--radius-md);
+        }
+
+        .quick-link-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .quick-link-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 48px;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .page-title { font-size: 36px; }
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--bg-card); border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">LocalBoost</a>
+            <ul class="nav-links">
+                <li><a href="/explore">Explore</a></li>
+                <li><a href="/deals">Deals</a></li>
+                <li><a href="/favorites">Favorites</a></li>
+                <li><a href="/reports">Reports</a></li>
+                <li><a href="/help" class="active">Help</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <div class="page-badge">
+                <svg class="page-badge-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                We're here to help
+            </div>
+            <h1 class="page-title">Help <span>Center</span></h1>
+            <p class="page-subtitle">Find answers to common questions or ask our smart assistant</p>
+        </div>
+
+        <!-- Search -->
+        <div class="search-container">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="M21 21l-4.35-4.35"/>
+            </svg>
+            <input type="text" class="search-input" id="search-input" placeholder="Search for help topics...">
+        </div>
+
+        <!-- FAQ Accordion -->
+        <div id="faq-container">
+            <!-- FAQ items will be loaded here -->
+        </div>
+
+        <!-- Interactive Q&A -->
+        <div class="qa-section">
+            <h2 class="qa-title">Ask Our Assistant</h2>
+            <p class="qa-subtitle">Can't find what you're looking for? Ask a question below.</p>
+
+            <div class="chat-container">
+                <div class="chat-header">
+                    <div class="chat-avatar">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="chat-title">LocalBoost Assistant</div>
+                        <div class="chat-status">Online</div>
+                    </div>
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message">
+                        <div class="message-avatar bot">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                            </svg>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-sender">LocalBoost Assistant</div>
+                            <div class="message-text">Hi there! I'm here to help you get the most out of LocalBoost. Ask me anything about finding businesses, leaving reviews, using deals, or any other features!</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" id="chat-input" placeholder="Type your question...">
+                    <button class="chat-send" id="chat-send">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="quick-links">
+            <a href="/explore" class="quick-link">
+                <div class="quick-link-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="M21 21l-4.35-4.35"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="quick-link-title">Explore Businesses</div>
+                    <div class="quick-link-desc">Discover local gems</div>
+                </div>
+            </a>
+            <a href="/deals" class="quick-link">
+                <div class="quick-link-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
+                        <line x1="7" y1="7" x2="7.01" y2="7"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="quick-link-title">Browse Deals</div>
+                    <div class="quick-link-desc">Save on local favorites</div>
+                </div>
+            </a>
+            <a href="/reports" class="quick-link">
+                <div class="quick-link-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <line x1="18" y1="20" x2="18" y2="10"/>
+                        <line x1="12" y1="20" x2="12" y2="4"/>
+                        <line x1="6" y1="20" x2="6" y2="14"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="quick-link-title">View Reports</div>
+                    <div class="quick-link-desc">Analyze business data</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // FAQ Data
+        const faqData = [
+            {
+                id: 1,
+                question: 'How do I find businesses near me?',
+                answer: 'Use the Explore page to discover local businesses. You can browse by category (Food, Retail, Services, Entertainment, Health) or use the search bar to find specific businesses. You can also sort results by rating, number of reviews, or name to find exactly what you\'re looking for.'
+            },
+            {
+                id: 2,
+                question: 'How do I leave a review?',
+                answer: 'To leave a review, navigate to a business detail page by clicking on any business card. Scroll down to the Reviews section where you\'ll find a review form. Select your star rating, optionally add a title, write your review, and complete the CAPTCHA verification to ensure authenticity. Your review helps other community members make informed decisions!'
+            },
+            {
+                id: 3,
+                question: 'How do I save a business to my favorites?',
+                answer: 'You can save businesses in two ways: 1) Click the heart icon on any business card in the Explore page, or 2) Click the "Add to Favorites" button on a business detail page. Access all your saved businesses anytime from the Favorites page in the navigation menu.'
+            },
+            {
+                id: 4,
+                question: 'How do I use a deal or coupon?',
+                answer: 'Visit the Deals page to see all active promotions. Each deal shows the discount amount, description, and expiration date. If there\'s a coupon code, click the "Copy" button to copy it to your clipboard. Present the code at the business when making your purchase. Some deals may have specific terms or conditions listed.'
+            },
+            {
+                id: 5,
+                question: 'What is the CAPTCHA verification for?',
+                answer: 'The CAPTCHA verification is a simple math problem that helps us ensure reviews come from real humans, not automated bots. This keeps our review system authentic and trustworthy. Simply solve the math problem (like "What is 5 + 3?") and enter your answer to verify you\'re human.'
+            },
+            {
+                id: 6,
+                question: 'How do I generate a report?',
+                answer: 'Go to the Reports page and use the filter controls to customize your report. You can filter by category, date range, and data type. Click "Generate Report" to see statistics, charts, and tables showing business insights. You can also export the report as CSV or print it for your records.'
+            },
+            {
+                id: 7,
+                question: 'How are business ratings calculated?',
+                answer: 'Business ratings are calculated as the average of all user reviews. Each review can rate from 1 to 5 stars. The displayed rating is the mean of all these ratings. Higher ratings indicate better overall customer satisfaction based on community feedback.'
+            },
+            {
+                id: 8,
+                question: 'What do the different categories mean?',
+                answer: 'Our categories help organize businesses: <strong>Food & Dining</strong> includes restaurants, cafes, and bakeries. <strong>Retail</strong> covers shops, boutiques, and stores. <strong>Services</strong> includes salons, repairs, and professional services. <strong>Entertainment</strong> has venues and activities. <strong>Health & Wellness</strong> includes fitness, wellness, and medical services.'
+            }
+        ];
+
+        // Render FAQs
+        function renderFAQs(faqs) {
+            const container = document.getElementById('faq-container');
+
+            if (faqs.length === 0) {
+                container.innerHTML = '<div class="no-results">No results found. Try a different search term.</div>';
+                return;
+            }
+
+            container.innerHTML = faqs.map(faq => `
+                <div class="faq-item" data-id="${faq.id}">
+                    <button class="faq-question">
+                        ${faq.question}
+                        <span class="faq-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </span>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">${faq.answer}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Add click handlers
+            document.querySelectorAll('.faq-question').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const item = btn.closest('.faq-item');
+                    const wasActive = item.classList.contains('active');
+
+                    // Close all
+                    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+
+                    // Open clicked if not already open
+                    if (!wasActive) {
+                        item.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        // Search FAQs
+        let searchTimeout;
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const query = e.target.value.toLowerCase();
+
+                if (!query) {
+                    renderFAQs(faqData);
+                    return;
+                }
+
+                const filtered = faqData.filter(faq =>
+                    faq.question.toLowerCase().includes(query) ||
+                    faq.answer.toLowerCase().includes(query)
+                );
+
+                renderFAQs(filtered);
+            }, 200);
+        });
+
+        // Chat functionality
+        const chatResponses = {
+            'search': 'To search for businesses, use the search bar on the Explore page. You can search by business name, description, or browse by category using the sidebar filters.',
+            'review': 'To leave a review, go to a business detail page and scroll to the Reviews section. Fill in your rating, write your review, complete the CAPTCHA verification, and click Submit!',
+            'favorite': 'Click the heart icon on any business card or the "Add to Favorites" button on a detail page. View all your favorites from the Favorites page.',
+            'deal': 'Check out the Deals page for active promotions. Click "Copy" to grab the coupon code and show it at the business!',
+            'rating': 'Ratings are averages of all user reviews on a 1-5 star scale. Higher is better!',
+            'captcha': 'CAPTCHA verification prevents bots from leaving fake reviews. Just solve the simple math problem to verify you\'re human.',
+            'report': 'Use the Reports page to generate custom analytics. Filter by category and date range, then export as CSV or print.',
+            'category': 'We have 5 categories: Food & Dining, Retail, Services, Entertainment, and Health & Wellness.',
+            'hello': 'Hello! How can I help you today? You can ask me about finding businesses, leaving reviews, using deals, or any other LocalBoost features.',
+            'hi': 'Hi there! What can I help you with? Feel free to ask about any LocalBoost feature.',
+            'thanks': 'You\'re welcome! Is there anything else I can help you with?',
+            'help': 'I can help you with: searching businesses, leaving reviews, saving favorites, using deals, generating reports, and understanding ratings. What would you like to know more about?'
+        };
+
+        function getResponse(query) {
+            const lowerQuery = query.toLowerCase();
+
+            for (const [keyword, response] of Object.entries(chatResponses)) {
+                if (lowerQuery.includes(keyword)) {
+                    return response;
+                }
+            }
+
+            return "I'm not sure about that specific question. You can browse the FAQ above or try rephrasing your question. Common topics include: searching businesses, leaving reviews, using deals, saving favorites, and generating reports.";
+        }
+
+        function addMessage(text, isUser) {
+            const container = document.getElementById('chat-messages');
+
+            const messageHtml = `
+                <div class="message ${isUser ? 'user' : ''}">
+                    <div class="message-avatar ${isUser ? 'user' : 'bot'}">
+                        ${isUser ?
+                            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' :
+                            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>'
+                        }
+                    </div>
+                    <div class="message-content">
+                        <div class="message-sender">${isUser ? 'You' : 'LocalBoost Assistant'}</div>
+                        <div class="message-text">${text}</div>
+                    </div>
+                </div>
+            `;
+
+            container.insertAdjacentHTML('beforeend', messageHtml);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+
+            if (!text) return;
+
+            // Add user message
+            addMessage(text, true);
+            input.value = '';
+
+            // Simulate typing delay
+            setTimeout(() => {
+                const response = getResponse(text);
+                addMessage(response, false);
+            }, 500 + Math.random() * 500);
+        }
+
+        document.getElementById('chat-send').addEventListener('click', sendMessage);
+        document.getElementById('chat-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // Initialize
+        renderFAQs(faqData);
+    </script>
+</body>
+</html>
